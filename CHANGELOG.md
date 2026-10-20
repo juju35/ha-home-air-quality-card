@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1
+
+### Changes
+- Smaller title and icon, the size of a Home Assistant heading card.
+
 ## 1.0.0
 
 First public release.
