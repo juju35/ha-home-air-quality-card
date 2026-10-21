@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0
+
+### Changes
+- The room list folds like ha-carburants-france and ha-renault-card: the chevron points right when folded and down when unfolded, and a click anywhere else on the page folds the list back to its default (`expanded`).
+
 ## 1.0.1
 
 ### Changes

@@ -1,4 +1,4 @@
-var HOME_AIR_QUALITY_CARD_VERSION = '1.0.1';
+var HOME_AIR_QUALITY_CARD_VERSION = '1.1.0';
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 var AqI18n = {
@@ -199,7 +199,7 @@ class HomeAirQualityCard extends HTMLElement {
     if (!config) throw new Error('Invalid configuration');
     if (config.rooms && !Array.isArray(config.rooms)) throw new Error('rooms must be a list');
     this._config = Object.assign({}, AQ_DEFAULTS, config);
-    this._open = !!this._config.expanded;
+    this._open = null;
     if (!this.shadowRoot) {
       this.attachShadow({ mode: 'open' });
       this.shadowRoot.addEventListener('click', (ev) => this._onClick(ev));
@@ -209,6 +209,27 @@ class HomeAirQualityCard extends HTMLElement {
     }
     this._sig = null;
     this._update();
+  }
+
+  // Room list open: what the user toggled, else the `expanded` default.
+  _isOpen() {
+    return this._open != null ? this._open : !!this._config.expanded;
+  }
+
+  connectedCallback() {
+    // A click elsewhere folds the list back to its default (as in ha-carburants-france). A click,
+    // not a pointerdown: folding on press would shift the layout under the pointer before the click.
+    this._onOutside = this._onOutside || ((ev) => {
+      if (this._open == null) return;
+      if ((ev.composedPath ? ev.composedPath() : []).indexOf(this) !== -1) return;
+      this._open = null;
+      this._update();
+    });
+    document.addEventListener('click', this._onOutside, true);
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener('click', this._onOutside, true);
   }
 
   set hass(hass) {
@@ -310,7 +331,7 @@ class HomeAirQualityCard extends HTMLElement {
     var hass = this._hass, c = this._config;
     var ids = [c.outdoor_temperature, c.outdoor_humidity];
     rooms.forEach(function (r) { ids.push(r.co2, r.temperature, r.humidity); });
-    var sig = JSON.stringify([this._lang(), this._open, rooms.map(function (r) { return [r.name, r.icon, r.level]; }), ids.map(function (id) {
+    var sig = JSON.stringify([this._lang(), this._isOpen(), rooms.map(function (r) { return [r.name, r.icon, r.level]; }), ids.map(function (id) {
       var s = id && hass.states[id];
       return s ? [id, s.state, s.attributes.unit_of_measurement] : null;
     })]);
@@ -381,11 +402,12 @@ class HomeAirQualityCard extends HTMLElement {
     } else {
       if (alerts.length) body += '<div class="rooms">' + alerts.map((r) => this._row(r)).join('') + '</div>';
       if (c.show_all_rooms && others.length) {
-        body += '<div class="expander' + (this._open ? ' open' : '') + '">' +
-          '<div class="exp-head" data-toggle="1" role="button" tabindex="0" aria-expanded="' + this._open + '">' +
+        var open = this._isOpen();
+        body += '<div class="expander' + (open ? ' open' : '') + '">' +
+          '<div class="exp-head" data-toggle="1" role="button" tabindex="0" aria-expanded="' + open + '">' +
           '<ha-icon icon="mdi:format-list-bulleted"></ha-icon><span>' + this._t(alerts.length ? 'other_rooms' : 'all_rooms') + '</span>' +
           '<span class="count">' + others.length + '</span><ha-icon class="exp-chev" icon="mdi:chevron-down"></ha-icon></div>' +
-          (this._open ? '<div class="rooms">' + others.map((r) => this._row(r)).join('') + '</div>' : '') + '</div>';
+          (open ? '<div class="rooms">' + others.map((r) => this._row(r)).join('') + '</div>' : '') + '</div>';
       }
     }
 
@@ -435,15 +457,15 @@ class HomeAirQualityCard extends HTMLElement {
       '.exp-head > ha-icon { --mdc-icon-size: 20px; color: var(--secondary-text-color); }' +
       '.exp-head > span:first-of-type { flex: 1; }' +
       '.count { font-size: 12px; color: var(--secondary-text-color); font-weight: 400; }' +
-      '.exp-chev { transition: transform 0.2s ease; }' +
-      '.expander.open .exp-chev { transform: rotate(180deg); }' +
+      '.exp-chev { transition: transform 0.2s ease; transform: rotate(-90deg); }' +
+      '.expander.open .exp-chev { transform: none; }' +
     '</style>';
   }
 
   _onClick(ev) {
     var path = ev.composedPath();
     if (path.some((n) => n.dataset && n.dataset.toggle)) {
-      this._open = !this._open;
+      this._open = !this._isOpen();
       this._update();
       return;
     }
