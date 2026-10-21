@@ -1,12 +1,14 @@
 # Changelog
 
+## 1.1.1
+
+### Development
+- `npm run screenshots` renders the README screenshots with mock rooms. Nothing changes for users.
+
 ## 1.1.0
 
 ### Changes
 - The room list folds like ha-carburants-france and ha-renault-card: the chevron points right when folded and down when unfolded, and a click anywhere else on the page folds the list back to its default (`expanded`).
-
-### Development
-- `npm run screenshots` renders the README screenshots with mock rooms.
 
 ## 1.0.1
 

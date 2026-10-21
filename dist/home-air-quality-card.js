@@ -1,4 +1,4 @@
-var HOME_AIR_QUALITY_CARD_VERSION = '1.1.0';
+var HOME_AIR_QUALITY_CARD_VERSION = '1.1.1';
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 var AqI18n = {
