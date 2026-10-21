@@ -34,7 +34,7 @@ Add the card, it finds the rooms by itself from your areas.
 
 ## Prerequisites
 
-- Home Assistant with CO₂, temperature or humidity sensors (Netatmo, Airthings, Aqara, ESPHome…)
+- Home Assistant 2024.8 or later with CO₂, temperature or humidity sensors (Netatmo, Airthings, Aqara, ESPHome…)
 - Areas set on the sensors or their devices, for the automatic discovery; otherwise list the rooms by hand
 
 ## Installation

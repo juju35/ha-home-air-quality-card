@@ -2,5 +2,6 @@
   "name": "Home Air Quality Card",
   "render_readme": true,
   "content_in_root": false,
-  "filename": "home-air-quality-card.js"
+  "filename": "home-air-quality-card.js",
+  "homeassistant": "2024.8.0"
 }

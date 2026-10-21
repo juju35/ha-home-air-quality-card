@@ -102,7 +102,7 @@ for (const s of SHOTS) {
     el.setConfig({ type: "custom:home-air-quality-card", blink: false, ...config });
     el.hass = { ...hass, themes: { darkMode: dark }, callService: async () => {} };
     document.getElementById("root").appendChild(el);
-  }, { config: s.config, hass, dark: s.theme === "dark" });
+  }, { config: s.config, hass: { ...hass, language: s.theme === "dark" ? "fr" : "en", locale: { language: s.theme === "dark" ? "fr" : "en" } }, dark: s.theme === "dark" });
   await page.waitForTimeout(400);
   await page.locator("home-air-quality-card").screenshot({ path: `${root}screenshots/${s.file}.png`, animations: "disabled" });
   console.log(`screenshots/${s.file}.png`);

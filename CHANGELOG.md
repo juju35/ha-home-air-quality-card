@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1
+
+### Changes
+- HACS now asks for Home Assistant 2024.8 or later, the version that brought the sections view the card supports; the README says so under **Prerequisites**.
+- The light README screenshots are in English, the dark ones in French.
+
 ## 1.2.0
 
 ### Changes
