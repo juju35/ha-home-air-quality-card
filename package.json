@@ -1,0 +1,13 @@
+{
+  "name": "ha-home-air-quality-card",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "screenshots": "node scripts/screenshots.mjs"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@mdi/js": "^7.4.47",
+    "playwright": "^1.56.1"
+  }
+}
