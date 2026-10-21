@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0
+
+### Changes
+- Header aligned with the other ha-* cards: an icon coloured by the worst room, the title in 18px with the summary underneath, the outdoor badges on the title row.
+- Warning and critical colors fall back to Home Assistant's defaults (`#ffa600`, `#db4437`), like the other ha-* cards; badges, room tiles and the room list title use the shared sizes.
+
+### Development
+- The card source moves to `src/home-air-quality-card.js`; the built card is no longer committed in `dist/`: CI builds it on every push, and the release workflow builds it and attaches it to the release, which is where HACS downloads it from.
+- Releases are published when `version` in `package.json` has no tag yet; merged-branch cleanup workflow.
+- README: Prerequisites, Screenshots and Development sections.
+
 ## 1.1.1
 
 ### Development

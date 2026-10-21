@@ -26,12 +26,11 @@ If applicable, add screenshots to help explain your problem.
 - Browser:
 - HACS version:
 - Card version:
-- Sensors (brand / integration):
+- Sensors (brand and model):
 
 **Card configuration:**
 ```yaml
 type: custom:home-air-quality-card
-rooms: ...
 ```
 
 **Additional context**
