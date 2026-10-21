@@ -1,8 +1,12 @@
 {
   "name": "ha-home-air-quality-card",
+  "version": "1.2.0",
+  "description": "Lovelace card for Home Assistant showing the indoor air quality of every room: CO2, temperature and humidity.",
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/build.mjs && node --check dist/home-air-quality-card.js",
     "screenshots": "node scripts/screenshots.mjs"
   },
   "license": "MIT",
