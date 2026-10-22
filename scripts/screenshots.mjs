@@ -11,7 +11,7 @@ const cardJs = readFileSync(`${root}dist/home-air-quality-card.js`, "utf8");
 // Every mdi:* icon the card can use, as SVG paths for the <ha-icon> stand-in.
 const icons = {};
 for (const name of new Set(cardJs.match(/mdi:[a-z0-9-]+/g))) {
-  const key = "mdi" + name.slice(4).replace(/(^|-)([a-z0-9])/g, (_, __, c) => c.toUpperCase());
+  const key = `mdi${name.slice(4).replace(/(^|-)([a-z0-9])/g, (_, __, c) => c.toUpperCase())}`;
   if (mdi[key]) icons[name.slice(4)] = mdi[key];
 }
 
