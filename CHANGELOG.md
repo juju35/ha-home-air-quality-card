@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0
+
+### Changes
+- More compact layout with the same information, like the other ha-* cards: 12 px card padding, 36 px header icon, 16 px name and 12 px subtitle, 11 px pills, tighter tiles and sections.
+- Rooms in a two-column grid when the card is at least 370 px wide (one column below), 32 px room badges.
+
 ## 1.2.1
 
 ### Changes

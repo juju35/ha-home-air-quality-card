@@ -418,48 +418,48 @@ class HomeAirQualityCard extends HTMLElement {
   _styles() {
     return '<style>' +
       ':host { display: block; height: 100%; --aq-ok: var(--success-color, #43a047); --aq-warn: var(--warning-color, #ffa600); --aq-crit: var(--error-color, #db4437); }' +
-      'ha-card { height: 100%; box-sizing: border-box; padding: 16px; display: flex; flex-direction: column; gap: 12px; }' +
-      '.header { display: flex; align-items: center; gap: 12px; }' +
-      '.hicon { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center;' +
+      'ha-card { height: 100%; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; gap: 10px; }' +
+      '.header { display: flex; align-items: center; gap: 10px; }' +
+      '.hicon { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center;' +
         ' --aq-c: var(--aq-ok); background: color-mix(in srgb, var(--aq-c) 15%, transparent); color: var(--aq-c); }' +
       '.hicon.warn { --aq-c: var(--aq-warn); } .hicon.crit { --aq-c: var(--aq-crit); }' +
       '.hicon ha-icon { --mdc-icon-size: 24px; }' +
       '.titles { flex: 1; min-width: 0; }' +
       '.name-row { display: flex; align-items: center; gap: 8px; }' +
-      '.name { flex: 1; min-width: 0; font-size: 18px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }' +
-      '.summary { font-size: 13px; line-height: 1.35; margin-top: 2px; }' +
+      '.name { flex: 1; min-width: 0; font-size: 16px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }' +
+      '.summary { font-size: 12px; line-height: 1.35; margin-top: 2px; }' +
       '.summary.ok { color: var(--secondary-text-color); }' +
       '.summary.warn { color: var(--aq-warn); }' +
       '.summary.crit { color: var(--aq-crit); }' +
       '.chips { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }' +
-      '.chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; padding: 2px 10px 2px 6px; border-radius: 12px; cursor: pointer;' +
+      '.chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 1px 8px 1px 5px; border-radius: 12px; cursor: pointer;' +
         ' background: var(--secondary-background-color, rgba(128,128,128,0.12)); color: var(--primary-text-color); white-space: nowrap; }' +
-      '.chip ha-icon { --mdc-icon-size: 14px; color: var(--secondary-text-color); }' +
+      '.chip ha-icon { --mdc-icon-size: 13px; color: var(--secondary-text-color); }' +
       '.chip-name { color: var(--secondary-text-color); font-weight: 400; }' +
       '.empty { display: flex; align-items: center; gap: 10px; color: var(--secondary-text-color); }' +
-      '.rooms { display: flex; flex-direction: column; gap: 8px; }' +
-      '.room { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 10px;' +
+      '.rooms { display: grid; flex-direction: column; gap: 6px; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }' +
+      '.room { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 10px;' +
         ' background: var(--secondary-background-color, rgba(128,128,128,0.1)); --aq-c: var(--aq-ok); }' +
       '.room[role=button] { cursor: pointer; }' +
       '.room.warn { --aq-c: var(--aq-warn); }' +
       '.room.crit { --aq-c: var(--aq-crit); }' +
-      '.shape { position: relative; width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center;' +
+      '.shape { position: relative; width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center;' +
         ' background: color-mix(in srgb, var(--aq-c) 15%, transparent); color: var(--aq-c); }' +
-      '.shape > ha-icon { --mdc-icon-size: 22px; }' +
+      '.shape > ha-icon { --mdc-icon-size: 18px; }' +
       '.shape.blink > ha-icon { animation: aq-blink 1.5s ease-in-out infinite; }' +
       '@keyframes aq-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }' +
       '@media (prefers-reduced-motion: reduce) { .shape.blink > ha-icon { animation: none; } }' +
-      '.badge { position: absolute; top: -3px; right: -3px; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center;' +
+      '.badge { position: absolute; top: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center;' +
         ' background: var(--aq-c); color: #fff; box-shadow: 0 0 0 2px var(--card-background-color, #fff); }' +
       '.badge ha-icon { --mdc-icon-size: 12px; }' +
       '.room-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }' +
-      '.room-name { font-size: 14px; font-weight: 500; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }' +
-      '.room-values { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }' +
+      '.room-name { font-size: 13px; font-weight: 500; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }' +
+      '.room-values { font-size: 11px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }' +
       '.room-values .warn { color: var(--aq-warn); font-weight: 500; }' +
       '.room-values .crit { color: var(--aq-crit); font-weight: 500; }' +
       '.chev { color: var(--secondary-text-color); --mdc-icon-size: 20px; flex-shrink: 0; }' +
-      '.expander { display: flex; flex-direction: column; gap: 8px; }' +
-      '.exp-head { display: flex; align-items: center; gap: 10px; padding: 6px 4px; cursor: pointer; border-radius: 10px; color: var(--secondary-text-color); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }' +
+      '.expander { display: flex; flex-direction: column; gap: 6px; }' +
+      '.exp-head { display: flex; align-items: center; gap: 10px; padding: 2px 4px; cursor: pointer; border-radius: 10px; color: var(--secondary-text-color); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }' +
       '.exp-head > ha-icon { --mdc-icon-size: 20px; color: var(--secondary-text-color); }' +
       '.exp-head > span:first-of-type { flex: 1; }' +
       '.count { font-size: 12px; color: var(--secondary-text-color); font-weight: 400; }' +
