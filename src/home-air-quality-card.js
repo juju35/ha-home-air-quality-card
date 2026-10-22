@@ -108,9 +108,7 @@ function aqT(lang, key) {
 }
 
 function aqEsc(s) {
-  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
-    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-  });
+  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 // "Salle De Bain" → "salle de bain", without accents, for name matching.
@@ -153,14 +151,12 @@ function aqAreaOf(hass, e) {
 // CO₂ first, then temperature and humidity, preferring the CO₂ sensor's own device.
 function aqAreaSensors(hass, areaId) {
   var out = {};
-  if (!hass || !hass.entities || !areaId) return out;
-  var list = Object.values(hass.entities).filter(function (e) {
-    return e.entity_id.indexOf('sensor.') === 0 && !e.hidden && hass.states[e.entity_id] && aqAreaOf(hass, e) === areaId;
-  });
+  if (!hass?.entities || !areaId) return out;
+  var list = Object.values(hass.entities).filter((e) => e.entity_id.indexOf('sensor.') === 0 && !e.hidden && hass.states[e.entity_id] && aqAreaOf(hass, e) === areaId);
   var device = null;
-  ['co2', 'temperature', 'humidity'].forEach(function (role) {
-    var hits = list.filter(function (e) { return hass.states[e.entity_id].attributes.device_class === AQ_SENSORS[role]; });
-    var hit = (device && hits.find(function (e) { return e.device_id === device; })) || hits[0];
+  ['co2', 'temperature', 'humidity'].forEach((role) => {
+    var hits = list.filter((e) => hass.states[e.entity_id].attributes.device_class === AQ_SENSORS[role]);
+    var hit = (device && hits.find((e) => e.device_id === device)) || hits[0];
     if (hit) {
       out[role] = hit.entity_id;
       if (!device) device = hit.device_id;
@@ -171,15 +167,15 @@ function aqAreaSensors(hass, areaId) {
 
 function aqRoomIcon(hass, areaId, name) {
   var area = areaId && hass.areas ? hass.areas[areaId] : null;
-  if (area && area.icon) return area.icon;
-  var text = aqFold(name + ' ' + (areaId || ''));
-  var hit = AQ_ROOM_ICONS.find(function (p) { return p[0].test(text); });
+  if (area?.icon) return area.icon;
+  var text = aqFold(`${name} ${areaId || ''}`);
+  var hit = AQ_ROOM_ICONS.find((p) => p[0].test(text));
   return hit ? hit[1] : 'mdi:home';
 }
 
 function aqAutoRooms(hass, exclude) {
-  if (!hass || !hass.areas) return [];
-  return Object.keys(hass.areas).filter(function (id) { return (exclude || []).indexOf(id) < 0; }).map(function (id) {
+  if (!hass?.areas) return [];
+  return Object.keys(hass.areas).filter((id) => (exclude || []).indexOf(id) < 0).map((id) => {
     var s = aqAreaSensors(hass, id);
     return s.co2 || s.temperature || s.humidity ? Object.assign({ area: id }, s) : null;
   }).filter(Boolean);
@@ -242,14 +238,14 @@ class HomeAirQualityCard extends HTMLElement {
   getGridOptions() { return { columns: 12, min_columns: 6 }; }
 
   _lang() {
-    var l = (this._config && this._config.language) || (this._hass && this._hass.language) || document.documentElement.lang || 'en';
+    var l = (this._config?.language) || (this._hass?.language) || document.documentElement.lang || 'en';
     l = l.split('-')[0];
     return AqI18n[l] ? l : 'en';
   }
 
   _t(k, vars) {
     var s = aqT(this._lang(), k);
-    Object.keys(vars || {}).forEach(function (v) { s = s.replace('{' + v + '}', vars[v]); });
+    Object.keys(vars || {}).forEach((v) => { s = s.replace(`{${v}}`, vars[v]); });
     return s;
   }
 
@@ -260,7 +256,7 @@ class HomeAirQualityCard extends HTMLElement {
   _num(id) {
     if (!this._avail(id)) return null;
     var n = Number(this._st(id).state);
-    return isNaN(n) ? null : n;
+    return Number.isNaN(n) ? null : n;
   }
 
   _fmt(id, digits) {
@@ -268,18 +264,18 @@ class HomeAirQualityCard extends HTMLElement {
     if (n == null) return '';
     var u = this._st(id).attributes.unit_of_measurement || '';
     var txt = n.toLocaleString(this._lang(), { maximumFractionDigits: digits });
-    return txt + (u ? ' ' + u : '');
+    return txt + (u ? ` ${u}` : '');
   }
 
   // Rooms from the config, completed from their area; every area with a sensor when there is no list.
   _rooms() {
     var hass = this._hass, c = this._config;
-    var list = c.rooms && c.rooms.length ? c.rooms : aqAutoRooms(hass, c.exclude_areas);
+    var list = c.rooms?.length ? c.rooms : aqAutoRooms(hass, c.exclude_areas);
     return list.map((r) => {
       var fromArea = r.area ? aqAreaSensors(hass, r.area) : {};
       var area = r.area && hass.areas ? hass.areas[r.area] : null;
-      var name = r.name || (area && area.name) || (r.co2 && this._st(r.co2) && this._st(r.co2).attributes.friendly_name) || r.area || '';
-      var outdoor = AQ_OUTDOOR.test(aqFold(name + ' ' + (r.area || '')));
+      var name = r.name || (area?.name) || (r.co2 && this._st(r.co2)?.attributes.friendly_name) || r.area || '';
+      var outdoor = AQ_OUTDOOR.test(aqFold(`${name} ${r.area || ''}`));
       var room = {
         name: name,
         area: r.area,
@@ -291,7 +287,7 @@ class HomeAirQualityCard extends HTMLElement {
         alerts: r.alerts !== undefined ? r.alerts !== false : !outdoor,
         outdoor: outdoor,
       };
-      ['co2_warning', 'co2_critical', 'humidity_warning', 'humidity_critical'].forEach(function (k) {
+      ['co2_warning', 'co2_critical', 'humidity_warning', 'humidity_critical'].forEach((k) => {
         room[k] = Number(r[k] != null && r[k] !== '' ? r[k] : c[k]);
       });
       room.co2Value = this._num(room.co2);
@@ -315,7 +311,7 @@ class HomeAirQualityCard extends HTMLElement {
     var mode = this._config.sort;
     if (mode === 'name') return rooms.slice().sort((a, b) => a.name.localeCompare(b.name, this._lang()));
     if (mode !== 'co2') return rooms;
-    return rooms.slice().sort(function (a, b) {
+    return rooms.slice().sort((a, b) => {
       if (b.level !== a.level) return b.level - a.level;
       var av = a.co2Value, bv = b.co2Value;
       if (av == null && bv == null) return 0;
@@ -330,8 +326,8 @@ class HomeAirQualityCard extends HTMLElement {
     var rooms = this._rooms();
     var hass = this._hass, c = this._config;
     var ids = [c.outdoor_temperature, c.outdoor_humidity];
-    rooms.forEach(function (r) { ids.push(r.co2, r.temperature, r.humidity); });
-    var sig = JSON.stringify([this._lang(), this._isOpen(), rooms.map(function (r) { return [r.name, r.icon, r.level]; }), ids.map(function (id) {
+    rooms.forEach((r) => { ids.push(r.co2, r.temperature, r.humidity); });
+    var sig = JSON.stringify([this._lang(), this._isOpen(), rooms.map((r) => [r.name, r.icon, r.level]), ids.map((id) => {
       var s = id && hass.states[id];
       return s ? [id, s.state, s.attributes.unit_of_measurement] : null;
     })]);
@@ -341,29 +337,29 @@ class HomeAirQualityCard extends HTMLElement {
   }
 
   _summary(alerts) {
-    var co2 = alerts.filter(function (r) { return r.co2Level; });
-    var hum = alerts.filter(function (r) { return r.humidityLevel; });
+    var co2 = alerts.filter((r) => r.co2Level);
+    var hum = alerts.filter((r) => r.humidityLevel);
     var parts = [];
     if (co2.length) parts.push(this._t(co2.length > 1 ? 'co2_high_many' : 'co2_high_one', { n: co2.length }));
-    if (hum.length) parts.push(this._t('humidity_high', { r: hum.map(function (r) { return r.name; }).join(', ') }));
+    if (hum.length) parts.push(this._t('humidity_high', { r: hum.map((r) => r.name).join(', ') }));
     if (!parts.length) return this._t('all_good');
     var s = parts.join(' · ');
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
 
   _row(r) {
-    var target = r.navigation_path ? ' data-nav="' + aqEsc(r.navigation_path) + '"' : '';
+    var target = r.navigation_path ? ` data-nav="${aqEsc(r.navigation_path)}"` : '';
     var more = r.co2 || r.humidity || r.temperature;
-    if (!target && more) target = ' data-more="' + aqEsc(more) + '"';
+    if (!target && more) target = ` data-more="${aqEsc(more)}"`;
     var color = ['ok', 'warn', 'crit'][r.level];
     var values = [];
-    if (this._avail(r.co2)) values.push('<span class="' + (r.alerts ? ['', 'warn', 'crit'][r.co2Level] : '') + '">' + aqEsc(this._fmt(r.co2, 0)) + '</span>');
-    if (this._avail(r.temperature)) values.push('<span>' + aqEsc(this._fmt(r.temperature, 1)) + '</span>');
-    if (this._avail(r.humidity)) values.push('<span class="' + (r.alerts ? ['', 'warn', 'crit'][r.humidityLevel] : '') + '">' + aqEsc(this._fmt(r.humidity, 0)) + '</span>');
+    if (this._avail(r.co2)) values.push(`<span class="${r.alerts ? ['', 'warn', 'crit'][r.co2Level] : ''}">${aqEsc(this._fmt(r.co2, 0))}</span>`);
+    if (this._avail(r.temperature)) values.push(`<span>${aqEsc(this._fmt(r.temperature, 1))}</span>`);
+    if (this._avail(r.humidity)) values.push(`<span class="${r.alerts ? ['', 'warn', 'crit'][r.humidityLevel] : ''}">${aqEsc(this._fmt(r.humidity, 0))}</span>`);
     var blink = r.level === 2 && this._config.blink ? ' blink' : '';
     return '<div class="room ' + color + '"' + target + (target ? ' role="button" tabindex="0"' : '') + '>' +
       '<div class="shape' + blink + '"><ha-icon icon="' + aqEsc(r.icon) + '"></ha-icon>' +
-      (r.level ? '<span class="badge"><ha-icon icon="' + (r.level === 2 ? 'mdi:alert-circle' : 'mdi:alert') + '"></ha-icon></span>' : '') + '</div>' +
+      (r.level ? `<span class="badge"><ha-icon icon="${r.level === 2 ? 'mdi:alert-circle' : 'mdi:alert'}"></ha-icon></span>` : '') + '</div>' +
       '<div class="room-text"><span class="room-name">' + aqEsc(r.name) + '</span>' +
       '<span class="room-values">' + values.join('<span class="sep"> · </span>') + '</span></div>' +
       (r.navigation_path ? '<ha-icon class="chev" icon="mdi:chevron-right"></ha-icon>' : '') + '</div>';
@@ -372,7 +368,7 @@ class HomeAirQualityCard extends HTMLElement {
   _badge(id, icon, name) {
     if (!this._avail(id)) return '';
     return '<span class="chip" data-more="' + aqEsc(id) + '" role="button" tabindex="0"><ha-icon icon="' + aqEsc(icon) + '"></ha-icon>' +
-      (name ? '<span class="chip-name">' + aqEsc(name) + '</span>' : '') + '<span>' + aqEsc(this._fmt(id, 1)) + '</span></span>';
+      (name ? `<span class="chip-name">${aqEsc(name)}</span>` : '') + '<span>' + aqEsc(this._fmt(id, 1)) + '</span></span>';
   }
 
   _render(rooms) {
@@ -382,37 +378,37 @@ class HomeAirQualityCard extends HTMLElement {
     // Outdoor badges: the configured entities, or the sensors of an outdoor area.
     var outT = c.outdoor_temperature, outH = c.outdoor_humidity, outName = c.outdoor_name;
     if (!outT && !outH) {
-      var out = rooms.find(function (r) { return r.outdoor; });
+      var out = rooms.find((r) => r.outdoor);
       if (out) { outT = out.temperature; outH = out.humidity; outName = outName || out.name; }
     }
     var badges = this._badge(outT, 'mdi:thermometer', outName) + this._badge(outH, 'mdi:water-percent');
 
-    var alerts = this._sort(rooms.filter(function (r) { return r.level; }));
-    var others = this._sort(rooms.filter(function (r) { return !r.level; }));
+    var alerts = this._sort(rooms.filter((r) => r.level));
+    var others = this._sort(rooms.filter((r) => !r.level));
     var worst = alerts.length ? alerts[0].level : 0;
 
     var level = ['ok', 'warn', 'crit'][worst];
     var header = '<div class="header"><div class="hicon ' + level + '"><ha-icon icon="' + aqEsc(c.icon || 'mdi:air-filter') + '"></ha-icon></div>' +
       '<div class="titles"><div class="name-row"><div class="name">' + aqEsc(title) + '</div>' +
-      (badges ? '<div class="chips">' + badges + '</div>' : '') + '</div>' +
-      (c.show_summary ? '<div class="summary ' + level + '">' + aqEsc(this._summary(alerts)) + '</div>' : '') + '</div></div>';
+      (badges ? `<div class="chips">${badges}</div>` : '') + '</div>' +
+      (c.show_summary ? `<div class="summary ${level}">${aqEsc(this._summary(alerts))}</div>` : '') + '</div></div>';
 
     var body = '';
     if (!rooms.length) {
-      body = '<div class="empty"><ha-icon icon="mdi:home-alert-outline"></ha-icon>' + this._t('no_rooms') + '</div>';
+      body = `<div class="empty"><ha-icon icon="mdi:home-alert-outline"></ha-icon>${this._t('no_rooms')}</div>`;
     } else {
-      if (alerts.length) body += '<div class="rooms">' + alerts.map((r) => this._row(r)).join('') + '</div>';
+      if (alerts.length) body += `<div class="rooms">${alerts.map((r) => this._row(r)).join('')}</div>`;
       if (c.show_all_rooms && others.length) {
         var open = this._isOpen();
         body += '<div class="expander' + (open ? ' open' : '') + '">' +
           '<div class="exp-head" data-toggle="1" role="button" tabindex="0" aria-expanded="' + open + '">' +
           '<ha-icon icon="mdi:format-list-bulleted"></ha-icon><span>' + this._t(alerts.length ? 'other_rooms' : 'all_rooms') + '</span>' +
           '<span class="count">' + others.length + '</span><ha-icon class="exp-chev" icon="mdi:chevron-down"></ha-icon></div>' +
-          (open ? '<div class="rooms">' + others.map((r) => this._row(r)).join('') + '</div>' : '') + '</div>';
+          (open ? `<div class="rooms">${others.map((r) => this._row(r)).join('')}</div>` : '') + '</div>';
       }
     }
 
-    this.shadowRoot.innerHTML = this._styles() + '<ha-card>' + header + body + '</ha-card>';
+    this.shadowRoot.innerHTML = `${this._styles()}<ha-card>${header}${body}</ha-card>`;
   }
 
   _styles() {
@@ -470,18 +466,18 @@ class HomeAirQualityCard extends HTMLElement {
 
   _onClick(ev) {
     var path = ev.composedPath();
-    if (path.some((n) => n.dataset && n.dataset.toggle)) {
+    if (path.some((n) => n.dataset?.toggle)) {
       this._open = !this._isOpen();
       this._update();
       return;
     }
-    var nav = path.find((n) => n.dataset && n.dataset.nav);
+    var nav = path.find((n) => n.dataset?.nav);
     if (nav) {
       history.pushState(null, '', nav.dataset.nav);
       window.dispatchEvent(new CustomEvent('location-changed', { detail: { replace: false } }));
       return;
     }
-    var more = path.find((n) => n.dataset && n.dataset.more);
+    var more = path.find((n) => n.dataset?.more);
     if (more) {
       this.dispatchEvent(new CustomEvent('hass-more-info', { detail: { entityId: more.dataset.more }, bubbles: true, composed: true }));
     }
@@ -499,9 +495,9 @@ class HomeAirQualityCardEditor extends HTMLElement {
   }
 
   set hass(hass) {
-    var prevLang = this._hass && this._hass.language;
+    var prevLang = this._hass?.language;
     this._hass = hass;
-    if (this._form && prevLang === (hass && hass.language)) {
+    if (this._form && prevLang === (hass?.language)) {
       this._form.hass = hass;
     } else {
       this._render();
@@ -509,7 +505,7 @@ class HomeAirQualityCardEditor extends HTMLElement {
   }
 
   _lang() {
-    var lang = (this._config && this._config.language) || (this._hass && this._hass.language) || 'en';
+    var lang = (this._config?.language) || (this._hass?.language) || 'en';
     lang = lang.split('-')[0];
     return AqI18n[lang] ? lang : 'en';
   }
@@ -533,7 +529,7 @@ class HomeAirQualityCardEditor extends HTMLElement {
       humidity_warning: { selector: pct },
       humidity_critical: { selector: pct },
     };
-    AQ_ROOM_FIELDS.forEach(function (k) { fields[k].label = t('rf_' + k); });
+    AQ_ROOM_FIELDS.forEach((k) => { fields[k].label = t(`rf_${k}`); });
     return [
       {
         type: 'grid', name: '', schema: [
@@ -566,7 +562,7 @@ class HomeAirQualityCardEditor extends HTMLElement {
       },
       {
         name: 'sort',
-        selector: { select: { mode: 'dropdown', options: ['co2', 'name', 'none'].map((v) => ({ value: v, label: t('sort_' + v) })) } },
+        selector: { select: { mode: 'dropdown', options: ['co2', 'name', 'none'].map((v) => ({ value: v, label: t(`sort_${v}`) })) } },
       },
       {
         name: 'language',
@@ -587,9 +583,9 @@ class HomeAirQualityCardEditor extends HTMLElement {
     var lang = this._lang();
     this._form.hass = this._hass;
     this._form.schema = this._schema();
-    this._form.computeLabel = (s) => aqT(lang, 'ed_' + s.name);
+    this._form.computeLabel = (s) => aqT(lang, `ed_${s.name}`);
     this._form.computeHelper = (s) => {
-      var key = 'ed_' + s.name + '_helper';
+      var key = `ed_${s.name}_helper`;
       var txt = aqT(lang, key);
       return txt === key ? undefined : txt;
     };
@@ -601,16 +597,16 @@ class HomeAirQualityCardEditor extends HTMLElement {
     var value = Object.assign({}, ev.detail.value);
     var lang = this._lang();
     // Keep the YAML short: drop options left empty or at their default.
-    Object.keys(value).forEach(function (key) {
+    Object.keys(value).forEach((key) => {
       if (value[key] === '' || value[key] === null || value[key] === undefined) delete value[key];
     });
-    Object.keys(AQ_DEFAULTS).forEach(function (key) {
+    Object.keys(AQ_DEFAULTS).forEach((key) => {
       if (value[key] === AQ_DEFAULTS[key]) delete value[key];
     });
     if (Array.isArray(value.rooms)) {
-      value.rooms = value.rooms.map(function (r) {
+      value.rooms = value.rooms.map((r) => {
         var room = {};
-        Object.keys(r || {}).forEach(function (k) { if (r[k] !== '' && r[k] !== null && r[k] !== undefined) room[k] = r[k]; });
+        Object.keys(r || {}).forEach((k) => { if (r[k] !== '' && r[k] !== null && r[k] !== undefined) room[k] = r[k]; });
         return room;
       });
       if (!value.rooms.length) delete value.rooms;
@@ -639,4 +635,4 @@ if (!customElements.get('home-air-quality-card')) {
   });
 }
 
-console.info('%c HOME-AIR-QUALITY-CARD %c v' + HOME_AIR_QUALITY_CARD_VERSION + ' ', 'color:#fff;background:#43a047;font-weight:700', 'color:#000;background:#fff');
+console.info(`%c HOME-AIR-QUALITY-CARD %c v${HOME_AIR_QUALITY_CARD_VERSION} `, 'color:#fff;background:#43a047;font-weight:700', 'color:#000;background:#fff');
