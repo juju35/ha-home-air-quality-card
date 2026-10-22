@@ -1,6 +1,6 @@
 {
   "name": "ha-home-air-quality-card",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Lovelace card for Home Assistant showing the indoor air quality of every room: CO2, temperature and humidity.",
   "private": true,
   "type": "module",
