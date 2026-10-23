@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.2
+
+### Fixes
+- Room values (CO₂ · temperature · humidity) wrap onto a second line instead of being cut off with an ellipsis, so humidity stays visible on narrow tiles; a value is never split.
+- A single room tile (e.g. one alert) now spans the full card width instead of half of it.
+
 ## 1.3.1
 
 ### Maintenance

@@ -433,7 +433,7 @@ class HomeAirQualityCard extends HTMLElement {
       '.chip ha-icon { --mdc-icon-size: 13px; color: var(--secondary-text-color); }' +
       '.chip-name { color: var(--secondary-text-color); font-weight: 400; }' +
       '.empty { display: flex; align-items: center; gap: 10px; color: var(--secondary-text-color); }' +
-      '.rooms { display: grid; flex-direction: column; gap: 6px; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }' +
+      '.rooms { display: grid; flex-direction: column; gap: 6px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }' +
       '.room { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 10px;' +
         ' background: var(--secondary-background-color, rgba(128,128,128,0.1)); --aq-c: var(--aq-ok); }' +
       '.room[role=button] { cursor: pointer; }' +
@@ -450,7 +450,8 @@ class HomeAirQualityCard extends HTMLElement {
       '.badge ha-icon { --mdc-icon-size: 12px; }' +
       '.room-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }' +
       '.room-name { font-size: 13px; font-weight: 500; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }' +
-      '.room-values { font-size: 11px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }' +
+      '.room-values { font-size: 11px; color: var(--secondary-text-color); }' +
+      '.room-values > span { white-space: nowrap; }' +
       '.room-values .warn { color: var(--aq-warn); font-weight: 500; }' +
       '.room-values .crit { color: var(--aq-crit); font-weight: 500; }' +
       '.chev { color: var(--secondary-text-color); --mdc-icon-size: 20px; flex-shrink: 0; }' +
