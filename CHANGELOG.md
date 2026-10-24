@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.3
+
+### Maintenance
+- Neutral room name in the screenshot mock data; screenshots regenerated.
+
 ## 1.3.2
 
 ### Fixes

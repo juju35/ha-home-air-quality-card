@@ -60,7 +60,7 @@ const pageHtml = (theme) => `<!doctype html><html><head><meta charset="utf-8">
 
 // Mock areas with CO₂, temperature and humidity sensors (null: no such sensor).
 const ROOMS = [
-  ["chambre_lea", "Chambre Léa", 1290, 18.8, 52],
+  ["chambre_amis", "Chambre Amis", 1290, 18.8, 52],
   ["salle_de_bain", "Salle De Bain", 399, 19.8, 83],
   ["chambre_3", "Chambre 3", 1043, 20.1, 51],
   ["chambre_parents", "Chambre Parents", 725, 20.1, 54],
