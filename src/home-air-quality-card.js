@@ -113,7 +113,7 @@ function aqEsc(s) {
 
 // "Salle De Bain" → "salle de bain", without accents, for name matching.
 function aqFold(s) {
-  return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
 var AQ_DEFAULTS = {
@@ -122,6 +122,9 @@ var AQ_DEFAULTS = {
 };
 
 var AQ_SENSORS = { co2: 'carbon_dioxide', temperature: 'temperature', humidity: 'humidity' };
+
+// Outdoor areas are listed but never raise an alert (outdoor humidity is often above 80 %).
+var AQ_OUTDOOR = /(terrasse|jardin|balcon|exterieur|garden|terrace|balcony|outdoor|outside|patio)/;
 
 // Room icon from the area name, when the area has no icon of its own.
 var AQ_ROOM_ICONS = [
@@ -135,11 +138,8 @@ var AQ_ROOM_ICONS = [
   [/(garage)/, 'mdi:garage'],
   [/(cave|cellar|basement|sous-sol)/, 'mdi:stairs-down'],
   [/(buanderie|laundry)/, 'mdi:washing-machine'],
-  [/(terrasse|jardin|balcon|exterieur|garden|terrace|balcony|outdoor|outside|patio)/, 'mdi:weather-sunny'],
+  [AQ_OUTDOOR, 'mdi:weather-sunny'],
 ];
-
-// Outdoor areas are listed but never raise an alert (outdoor humidity is often above 80 %).
-var AQ_OUTDOOR = /(terrasse|jardin|balcon|exterieur|garden|terrace|balcony|outdoor|outside|patio)/;
 
 // ── Entity discovery ─────────────────────────────────────────────────────────
 function aqAreaOf(hass, e) {
@@ -318,8 +318,10 @@ class HomeAirQualityCard extends HTMLElement {
   }
 
   // 0 ok, 1 warning (above the warning threshold), 2 critical (above the critical one).
+  // Thresholds given the wrong way round are swapped, so the critical one is always the higher.
   _level(v, warn, crit) {
     if (v == null) return 0;
+    if (warn > 0 && crit > 0 && crit < warn) [warn, crit] = [crit, warn];
     if (crit && v > crit) return 2;
     if (warn && v > warn) return 1;
     return 0;
@@ -451,7 +453,7 @@ class HomeAirQualityCard extends HTMLElement {
       '.chip ha-icon { --mdc-icon-size: 13px; color: var(--secondary-text-color); }' +
       '.chip-name { color: var(--secondary-text-color); font-weight: 400; }' +
       '.empty { display: flex; align-items: center; gap: 10px; color: var(--secondary-text-color); }' +
-      '.rooms { display: grid; flex-direction: column; gap: 6px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }' +
+      '.rooms { display: grid; gap: 6px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }' +
       '.room { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 10px;' +
         ' background: var(--secondary-background-color, rgba(128,128,128,0.1)); --aq-c: var(--aq-ok); }' +
       '.room[role=button] { cursor: pointer; }' +

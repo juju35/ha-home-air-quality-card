@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { loadCard } from "./load.mjs";
 
-const { aqAreaSensors, aqAutoRooms, aqAreaIndex, aqEsc } = loadCard("home-air-quality-card.js", [
+const { HomeAirQualityCard, aqAreaSensors, aqAutoRooms, aqAreaIndex, aqEsc, aqFold, aqRoomIcon } = loadCard("home-air-quality-card.js", [
+  "HomeAirQualityCard",
+  "aqFold",
+  "aqRoomIcon",
   "aqAreaSensors",
   "aqAutoRooms",
   "aqAreaIndex",
@@ -64,4 +67,21 @@ test("a sensor whose state is not loaded yet is ignored until it is", () => {
 
 test("aqEsc escapes HTML text and attributes", () => {
   assert.equal(aqEsc(`<"'&>`), "&lt;&quot;&#39;&amp;&gt;");
+});
+
+test("aqFold strips accents", () => {
+  assert.equal(aqFold("Séjour Entrée"), "sejour entree");
+});
+
+test("outdoor names get the outdoor icon", () => {
+  assert.equal(aqRoomIcon({ areas: {} }, null, "Terrasse"), "mdi:weather-sunny");
+  assert.equal(aqRoomIcon({ areas: {} }, null, "Chambre"), "mdi:bed");
+});
+
+test("thresholds given the wrong way round are swapped", () => {
+  const card = new HomeAirQualityCard();
+  assert.equal(card._level(1100, 1000, 1200), 1);
+  assert.equal(card._level(1100, 1200, 1000), 1);
+  assert.equal(card._level(1300, 1200, 1000), 2);
+  assert.equal(card._level(900, 1200, 1000), 0);
 });
