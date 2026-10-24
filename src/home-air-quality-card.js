@@ -148,11 +148,29 @@ function aqAreaOf(hass, e) {
   return d ? d.area_id : null;
 }
 
+// Visible sensor entries grouped by area, built once per `hass.entities` / `hass.devices` pair
+// (both only change with the registry); the states are still read on every update.
+var aqAreaIndex = new WeakMap();
+function aqSensorsByArea(hass) {
+  var memo = aqAreaIndex.get(hass.entities);
+  if (memo && memo.devices === hass.devices) return memo.index;
+  var index = new Map();
+  Object.values(hass.entities).forEach((e) => {
+    if (e.entity_id.indexOf('sensor.') !== 0 || e.hidden) return;
+    var area = aqAreaOf(hass, e);
+    if (!area) return;
+    if (!index.has(area)) index.set(area, []);
+    index.get(area).push(e);
+  });
+  aqAreaIndex.set(hass.entities, { devices: hass.devices, index: index });
+  return index;
+}
+
 // CO₂ first, then temperature and humidity, preferring the CO₂ sensor's own device.
 function aqAreaSensors(hass, areaId) {
   var out = {};
   if (!hass?.entities || !areaId) return out;
-  var list = Object.values(hass.entities).filter((e) => e.entity_id.indexOf('sensor.') === 0 && !e.hidden && hass.states[e.entity_id] && aqAreaOf(hass, e) === areaId);
+  var list = (aqSensorsByArea(hass).get(areaId) || []).filter((e) => hass.states[e.entity_id]);
   var device = null;
   ['co2', 'temperature', 'humidity'].forEach((role) => {
     var hits = list.filter((e) => hass.states[e.entity_id].attributes.device_class === AQ_SENSORS[role]);
