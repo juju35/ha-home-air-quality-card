@@ -91,8 +91,8 @@ humidity_critical: 80
 expanded: false
 sort: co2
 rooms:
-  - area: bedroom_lea
-    navigation_path: /dashboard-home/bedroom-lea
+  - area: bedroom_1
+    navigation_path: /dashboard-home/bedroom-1
   - name: Living room
     icon: mdi:sofa
     co2: sensor.living_room_co2
