@@ -58,31 +58,34 @@ const pageHtml = (theme) => `<!doctype html><html><head><meta charset="utf-8">
          font-family: Roboto, "Segoe UI", Helvetica, Arial, sans-serif; width: 428px; }
 </style></head><body><div id="root"></div></body></html>`;
 
-// Mock areas with CO₂, temperature and humidity sensors (null: no such sensor).
+// Mock areas with CO₂, temperature and humidity sensors (null: no such sensor), named in the language of the shot.
 const ROOMS = [
-  ["chambre_amis", "Chambre Amis", 1290, 18.8, 52],
-  ["salle_de_bain", "Salle De Bain", 399, 19.8, 83],
-  ["chambre_3", "Chambre 3", 1043, 20.1, 51],
-  ["chambre_parents", "Chambre Parents", 725, 20.1, 54],
-  ["sejour", "Séjour", 422, 20.5, 46],
-  ["toilettes", "Toilettes", null, 20.4, 48],
-  ["terrasse", "Terrasse", null, 12.5, 80],
+  ["guest_room", "Chambre Amis", "Guest Bedroom", 1290, 18.8, 52],
+  ["bathroom", "Salle De Bain", "Bathroom", 399, 19.8, 83],
+  ["bedroom_3", "Chambre 3", "Bedroom 3", 1043, 20.1, 51],
+  ["main_bedroom", "Chambre Parents", "Main Bedroom", 725, 20.1, 54],
+  ["living_room", "Séjour", "Living Room", 422, 20.5, 46],
+  ["toilet", "Toilettes", "Toilet", null, 20.4, 48],
+  ["terrace", "Terrasse", "Terrace", null, 12.5, 80],
 ];
-const areas = {}, entities = {}, devices = {}, states = {};
-for (const [id, name, co2, temp, hum] of ROOMS) {
-  areas[id] = { area_id: id, name, icon: null };
-  devices[id] = { id, area_id: id, name: `Capteur ${name}` };
-  const add = (role, dc, value, unit) => {
-    if (value == null) return;
-    const entity_id = `sensor.${id}_${role}`;
-    entities[entity_id] = { entity_id, device_id: id, area_id: null, platform: "mock" };
-    states[entity_id] = { entity_id, state: String(value), attributes: { device_class: dc, unit_of_measurement: unit, friendly_name: `${name} ${role}` } };
-  };
-  add("co2", "carbon_dioxide", co2, "ppm");
-  add("temperature", "temperature", temp, "°C");
-  add("humidity", "humidity", hum, "%");
+function mockHass(language) {
+  const areas = {}, entities = {}, devices = {}, states = {};
+  for (const [id, fr, en, co2, temp, hum] of ROOMS) {
+    const name = language === "fr" ? fr : en;
+    areas[id] = { area_id: id, name, icon: null };
+    devices[id] = { id, area_id: id, name: `${language === "fr" ? "Capteur" : "Sensor"} ${name}` };
+    const add = (role, dc, value, unit) => {
+      if (value == null) return;
+      const entity_id = `sensor.${id}_${role}`;
+      entities[entity_id] = { entity_id, device_id: id, area_id: null, platform: "mock" };
+      states[entity_id] = { entity_id, state: String(value), attributes: { device_class: dc, unit_of_measurement: unit, friendly_name: `${name} ${role}` } };
+    };
+    add("co2", "carbon_dioxide", co2, "ppm");
+    add("temperature", "temperature", temp, "°C");
+    add("humidity", "humidity", hum, "%");
+  }
+  return { states, entities, devices, areas, language, locale: { language } };
 }
-const hass = { states, entities, devices, areas, language: "fr", locale: { language: "fr" } };
 
 const SHOTS = [
   { file: "alerts", theme: "light", config: {} },
@@ -102,7 +105,7 @@ for (const s of SHOTS) {
     el.setConfig({ type: "custom:home-air-quality-card", blink: false, ...config });
     el.hass = { ...hass, themes: { darkMode: dark }, callService: async () => {} };
     document.getElementById("root").appendChild(el);
-  }, { config: s.config, hass: { ...hass, language: s.theme === "dark" ? "fr" : "en", locale: { language: s.theme === "dark" ? "fr" : "en" } }, dark: s.theme === "dark" });
+  }, { config: s.config, hass: mockHass(s.theme === "dark" ? "fr" : "en"), dark: s.theme === "dark" });
   await page.waitForTimeout(400);
   await page.locator("home-air-quality-card").screenshot({ path: `${root}screenshots/${s.file}.png`, animations: "disabled" });
   console.log(`screenshots/${s.file}.png`);

@@ -139,7 +139,7 @@ A room with an `area` takes the sensors of that area (the CO₂ sensor first, th
 | `icon` | Room icon; defaults to the area icon, or one picked from the name |
 | `co2` / `temperature` / `humidity` | Sensors, replacing the ones found in the area |
 | `navigation_path` | Dashboard opened on tap, e.g. `/dashboard-home/bedroom`; without it the tap opens the sensor details |
-| `alerts` | `false` to never put the room in alert (outdoor areas are `false` by default) |
+| `alerts` | `false` to never put the room in alert; `true` to keep alerts on a room whose name looks outdoor (outdoor areas are `false` by default) |
 | `co2_warning`, `co2_critical`, `humidity_warning`, `humidity_critical` | Thresholds for this room only |
 
 ## Screenshots
@@ -153,7 +153,9 @@ A room with an `area` takes the sensors of that area (the CO₂ sensor first, th
 
 A room is **in alert** when its CO₂ or humidity is above the warning threshold, **critical** above the critical threshold. Rooms in alert are listed first, critical ones before the others, then by CO₂. The summary counts the rooms with high CO₂ and names the rooms with high humidity.
 
-The automatic discovery goes through the areas, and keeps every area with a sensor whose device class is `carbon_dioxide`, `temperature` or `humidity` (set on the entity or on its device). Areas whose name looks outdoor (terrace, garden, balcony, outdoor…, in English and French) never raise an alert, and the first one fills the header badges when `outdoor_temperature` and `outdoor_humidity` are empty.
+The automatic discovery goes through the areas, and keeps every area with a sensor whose device class is `carbon_dioxide`, `temperature` or `humidity` (set on the entity or on its device). Areas whose name looks outdoor (terrace, garden, balcony, outdoor…, in English and French) never raise an alert, and the first one fills the header badges when `outdoor_temperature` and `outdoor_humidity` are empty. The match is on any part of the name: a room called *Winter garden* or *Jardin d'hiver* also counts as outdoor; list it under `rooms` with `alerts: true` to keep its alerts.
+
+A critical threshold set below the warning one is swapped with it, so the critical level is always the higher one.
 
 ## Development
 
